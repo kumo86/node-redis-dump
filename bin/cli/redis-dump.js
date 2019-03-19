@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+require('../cli');
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVkaXMtZHVtcC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jbGkvcmVkaXMtZHVtcC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBRUEsT0FBTyxDQUFDLFFBQVEsQ0FBQyxDQUFDIn0=

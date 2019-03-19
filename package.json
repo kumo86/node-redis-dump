@@ -9,25 +9,30 @@
     "command line",
     "json"
   ],
-  "author": "Jeremy Faivre <contact@jeremyfa.com>",
+  "author": "Jeremy Faivre <contact@jeremyfa.com>, UNHO JUNG <kumo86@gmail.com>",
   "main": "./bin/index.js",
   "scripts": {
     "test": "node ./bin/test.js"
   },
   "bin": {
-    "redis-dump": "./bin/cli/redis-dump"
+    "redis-dump": "./bin/cli/redis-dump.js"
   },
   "dependencies": {
-    "async": "^1.5.2",
-    "optimist": "^0.3.7",
+    "async": "^2.6.2",
+    "optimist": "^0.6.1",
     "redis": "^2.6.2"
   },
   "devDependencies": {
-    "coffee-script": "^1.2.0",
-    "glob": "^7.0.3"
+    "@types/async": "^2.4.1",
+    "@types/redis": "^2.8.11",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/jeremyfa/node-redis-dump.git"
+  },
+  "engines": {
+    "node": ">=8"
   }
 }

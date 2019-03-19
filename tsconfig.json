@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "esnext",
+    "inlineSourceMap": true,
+    "outDir": "bin",
+    "rootDir": "src"
+  },
+  "include": [
+    "src"
+  ]
+}

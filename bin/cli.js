@@ -1,52 +1,78 @@
-(function() {
-  var argv, doDump, dump, fs, params, path, pkg, ref, ref1, ref2, ref3, ref4, ref5;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const path = require("path");
+const optimist_1 = require("optimist");
+const dump_1 = require("./dump");
+const pkg = JSON.parse(fs.readFileSync(path.normalize(__dirname + '/../package.json'), 'utf8'));
+// Display help if requested
+if (optimist_1.argv.help) {
+    console.log(`
+        ${pkg.name} ${pkg.version}
 
-  fs = require('fs');
+        Usage: redis-dump [OPTIONS]
+          -h <hostname>    Server hostname (default: 127.0.0.1)
+          -p <port>        Server port (default: 6379)
+          -d <db>          Database number (default: 0)
+          -a <auth>        Password
+          -f <filter>      Query filter (default: *)
+          --convert        Convert from json to redis commands
+          --help           Output this help and exit
+          --json           Output result as json
+          --pretty         Make pretty indented output (use with --json)
+          --tls            tls
+          
+        Examples:
+          redis-dump
+          redis-dump -p 6500
+          redis-dump -f 'mydb:*' > mydb.dump.txt
+          redis-dump --json > mydb.json
+          cat mydb.json | redis-dump --convert
 
-  path = require('path');
+        The output is a valid list of redis commands.
+        That means the following will work:
+          redis-dump > dump.txt      # Dump redis database
+          cat dump.txt | redis-cli   # Import redis database from generated file
 
-  argv = require('optimist').argv;
-
-  dump = require('./dump');
-
-  pkg = JSON.parse(fs.readFileSync(path.normalize(__dirname + '/../package.json'), 'utf8'));
-
-  if (argv.help) {
-    console.log(pkg.name + " " + pkg.version + "\n\nUsage: redis-dump [OPTIONS]\n  -h <hostname>    Server hostname (default: 127.0.0.1)\n  -p <port>        Server port (default: 6379)\n  -d <db>          Database number (default: 0)\n  -a <auth>        Password\n  -f <filter>      Query filter (default: *)\n  --convert        Convert from json to redis commands\n  --help           Output this help and exit\n  --json           Output result as json\n  --pretty         Make pretty indented output (use with --json)\n\nExamples:\n  redis-dump\n  redis-dump -p 6500\n  redis-dump -f 'mydb:*' > mydb.dump.txt\n  redis-dump --json > mydb.json\n  cat mydb.json | redis-dump --convert\n\nThe output is a valid list of redis commands.\nThat means the following will work:\n  redis-dump > dump.txt      # Dump redis database\n  cat dump.txt | redis-cli   # Import redis database from generated file\n");
-  } else {
-    params = {
-      filter: (ref = argv.f) != null ? ref : '*',
-      db: (ref1 = argv.d) != null ? ref1 : 0,
-      port: (ref2 = argv.p) != null ? ref2 : 6379,
-      auth: (ref3 = argv.a) != null ? ref3 : null,
-      host: (ref4 = argv.h) != null ? ref4 : '127.0.0.1',
-      format: argv.json ? 'json' : 'redis',
-      pretty: (ref5 = argv.pretty) != null ? ref5 : false
+        `);
+}
+else {
+    const params = {
+        filter: optimist_1.argv.f ? optimist_1.argv.f : '*',
+        db: optimist_1.argv.d ? optimist_1.argv.d : 0,
+        port: optimist_1.argv.p ? optimist_1.argv.p : 6379,
+        auth: optimist_1.argv.a ? optimist_1.argv.a : null,
+        host: optimist_1.argv.h ? optimist_1.argv.h : '127.0.0.1',
+        format: optimist_1.argv.json ? 'json' : 'redis',
+        pretty: !!optimist_1.argv.pretty,
+        tls: !!optimist_1.argv.tls,
     };
-    doDump = function() {
-      return dump(params, function(err, result) {
-        var ref6;
-        if (err != null) {
-          return process.stderr.write(((ref6 = err.message) != null ? ref6 : err) + "\n");
-        }
-        if ((result != null) && ("" + result).replace(/^\s+/, '').replace(/\s+$/, '') !== '') {
-          console.log(result);
-        }
-        return process.exit(0);
-      });
+    // Dump operation
+    const doDump = () => {
+        return dump_1.dump(params, (err, result) => {
+            if (err != null) {
+                return process.stderr.write((err.message ? err.message : err) + "\n");
+            }
+            if ((result != null) && ("" + result).replace(/^\s+/, '').replace(/\s+$/, '') !== '') {
+                console.log(result);
+            }
+            return process.exit(0);
+        });
     };
-    if (argv.convert) {
-      params.convert = '';
-      process.stdin.resume();
-      process.stdin.on('data', function(chunk) {
-        return params.convert += "" + chunk;
-      });
-      process.stdin.on('end', function() {
-        return doDump();
-      });
-    } else {
-      doDump();
+    // If we are converting a stream from stdin, read it to the end
+    if (optimist_1.argv.convert) {
+        params.convert = '';
+        process.stdin.resume();
+        process.stdin.on('data', (chunk) => {
+            return params.convert += "" + chunk;
+        });
+        process.stdin.on('end', () => {
+            return doDump();
+        });
+        // Otherwise just run dump directly
     }
-  }
-
-}).call(this);
+    else {
+        doDump();
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2xpLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2NsaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLHlCQUF5QjtBQUN6Qiw2QkFBNkI7QUFDN0IsdUNBQThCO0FBQzlCLGlDQUE0QjtBQUU1QixNQUFNLEdBQUcsR0FBRyxJQUFJLENBQUMsS0FBSyxDQUFDLEVBQUUsQ0FBQyxZQUFZLENBQUMsSUFBSSxDQUFDLFNBQVMsQ0FBQyxTQUFTLEdBQUcsa0JBQWtCLENBQUMsRUFBRSxNQUFNLENBQUMsQ0FBQyxDQUFDO0FBQ2hHLDRCQUE0QjtBQUM1QixJQUFJLGVBQUksQ0FBQyxJQUFJLEVBQUU7SUFDWCxPQUFPLENBQUMsR0FBRyxDQUFDO1VBQ04sR0FBRyxDQUFDLElBQUksSUFBSSxHQUFHLENBQUMsT0FBTzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7U0EwQnhCLENBQUMsQ0FBQztDQUNWO0tBQU07SUFDSCxNQUFNLE1BQU0sR0FBUTtRQUNoQixNQUFNLEVBQUUsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsR0FBRztRQUM3QixFQUFFLEVBQUUsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQztRQUN2QixJQUFJLEVBQUUsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsSUFBSTtRQUM1QixJQUFJLEVBQUUsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsSUFBSTtRQUM1QixJQUFJLEVBQUUsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsZUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsV0FBVztRQUNuQyxNQUFNLEVBQUUsZUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsTUFBTSxDQUFDLENBQUMsQ0FBQyxPQUFPO1FBQ3BDLE1BQU0sRUFBRSxDQUFDLENBQUMsZUFBSSxDQUFDLE1BQU07UUFDckIsR0FBRyxFQUFFLENBQUMsQ0FBQyxlQUFJLENBQUMsR0FBRztLQUNsQixDQUFDO0lBQ0YsaUJBQWlCO0lBQ2pCLE1BQU0sTUFBTSxHQUFHLEdBQUcsRUFBRTtRQUNoQixPQUFPLFdBQUksQ0FBQyxNQUFNLEVBQUUsQ0FBQyxHQUFHLEVBQUUsTUFBTSxFQUFFLEVBQUU7WUFDaEMsSUFBSSxHQUFHLElBQUksSUFBSSxFQUFFO2dCQUNiLE9BQU8sT0FBTyxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMsQ0FBQyxHQUFHLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxHQUFHLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxHQUFHLENBQUMsR0FBRyxJQUFJLENBQUMsQ0FBQzthQUN6RTtZQUNELElBQUksQ0FBQyxNQUFNLElBQUksSUFBSSxDQUFDLElBQUksQ0FBQyxFQUFFLEdBQUcsTUFBTSxDQUFDLENBQUMsT0FBTyxDQUFDLE1BQU0sRUFBRSxFQUFFLENBQUMsQ0FBQyxPQUFPLENBQUMsTUFBTSxFQUFFLEVBQUUsQ0FBQyxLQUFLLEVBQUUsRUFBRTtnQkFDbEYsT0FBTyxDQUFDLEdBQUcsQ0FBQyxNQUFNLENBQUMsQ0FBQzthQUN2QjtZQUNELE9BQU8sT0FBTyxDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQztRQUMzQixDQUFDLENBQUMsQ0FBQztJQUNQLENBQUMsQ0FBQztJQUVGLCtEQUErRDtJQUMvRCxJQUFJLGVBQUksQ0FBQyxPQUFPLEVBQUU7UUFDZCxNQUFNLENBQUMsT0FBTyxHQUFHLEVBQUUsQ0FBQztRQUNwQixPQUFPLENBQUMsS0FBSyxDQUFDLE1BQU0sRUFBRSxDQUFDO1FBQ3ZCLE9BQU8sQ0FBQyxLQUFLLENBQUMsRUFBRSxDQUFDLE1BQU0sRUFBRSxDQUFDLEtBQUssRUFBRSxFQUFFO1lBQy9CLE9BQU8sTUFBTSxDQUFDLE9BQU8sSUFBSSxFQUFFLEdBQUcsS0FBSyxDQUFDO1FBQ3hDLENBQUMsQ0FBQyxDQUFDO1FBQ0gsT0FBTyxDQUFDLEtBQUssQ0FBQyxFQUFFLENBQUMsS0FBSyxFQUFFLEdBQUcsRUFBRTtZQUN6QixPQUFPLE1BQU0sRUFBRSxDQUFDO1FBQ3BCLENBQUMsQ0FBQyxDQUFBO1FBRUYsbUNBQW1DO0tBQ3RDO1NBQU07UUFDSCxNQUFNLEVBQUUsQ0FBQTtLQUNYO0NBQ0oifQ==
