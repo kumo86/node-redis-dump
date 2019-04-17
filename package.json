@@ -13,7 +13,7 @@
   "main": "./bin/index.js",
   "scripts": {
     "test": "node ./bin/test.js",
-    "postinstall": "tsc"
+    "postinstall": "./node_modules/.bin/tsc"
   },
   "bin": {
     "redis-dump": "./bin/cli/redis-dump.js"
