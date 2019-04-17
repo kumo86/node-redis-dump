@@ -12,7 +12,8 @@
   "author": "Jeremy Faivre <contact@jeremyfa.com>, UNHO JUNG <kumo86@gmail.com>",
   "main": "./bin/index.js",
   "scripts": {
-    "test": "node ./bin/test.js"
+    "test": "node ./bin/test.js",
+    "postinstall": "tsc"
   },
   "bin": {
     "redis-dump": "./bin/cli/redis-dump.js"
