@@ -39,6 +39,8 @@ Usage: redis-dump [OPTIONS]
   --help           Output this help and exit
   --json           Output result as json
   --pretty         Make pretty indented output (use with --json)
+  --tls            TLS connection to Redis (default: false)
+  --dirty          Not prepared del key command (RPUSH, SADD, ZADD, HMSET) (default: false)
 
 Examples:
   redis-dump

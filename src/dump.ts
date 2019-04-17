@@ -5,8 +5,10 @@ import {RedisClient} from 'redis';
 
 class RedisDumper {
     db: RedisClient;
+    clean: boolean;
 
-    constructor({port, host, auth, tls}) {
+    constructor({port, host, auth, tls, dirty}) {
+        this.clean = !dirty;
         if (auth != null) {
             this.db = redis.createClient(port, host, {
                 auth_pass: auth,
@@ -279,7 +281,7 @@ class RedisDumper {
                                     commands.push("SET     " + (this.escape(key)) + " " + (this.escape(value)));
                                     break;
                                 case 'list':
-                                    commands.push("DEL     " + (this.escape(key)));
+                                    if (this.clean) commands.push("DEL     " + (this.escape(key)));
                                     commands.push("RPUSH   " + (this.escape(key)) + " " + (((function () {
                                         var _l, _len3, _results;
                                         _results = [];
@@ -291,7 +293,7 @@ class RedisDumper {
                                     }).call(this)).join(' ')));
                                     break;
                                 case 'set':
-                                    commands.push("DEL     " + (this.escape(key)));
+                                    if (this.clean) commands.push("DEL     " + (this.escape(key)));
                                     if (value.length !== 0) {
                                         commands.push("SADD    " + (this.escape(key)) + " " + (((function () {
                                             var _l, _len3, _results;
@@ -305,7 +307,7 @@ class RedisDumper {
                                     }
                                     break;
                                 case 'zset':
-                                    commands.push("DEL     " + (this.escape(key)));
+                                    if (this.clean) commands.push("DEL     " + (this.escape(key)));
                                     if (value.length !== 0) {
                                         // SPLIT
                                         const limit = 1000;
@@ -324,7 +326,7 @@ class RedisDumper {
                                     }
                                     break;
                                 case 'hash':
-                                    commands.push("DEL     " + (this.escape(key)));
+                                    if (this.clean) commands.push("DEL     " + (this.escape(key)));
                                     len = 0;
                                     for (k in value) {
                                         len++;
@@ -377,6 +379,9 @@ export function dump(params, callback) {
     }
     if (params.convert == null) {
         params.convert = null;
+    }
+    if (params.dirty == null) {
+        params.dirty = false;
     }
     dumper = new RedisDumper(params);
     return dumper.dump(params, function () {

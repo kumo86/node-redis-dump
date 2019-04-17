@@ -19,7 +19,8 @@ if (argv.help) {
           --help           Output this help and exit
           --json           Output result as json
           --pretty         Make pretty indented output (use with --json)
-          --tls            tls
+          --tls            TLS connection to Redis (default: false)
+          --dirty          Not prepared del key command (RPUSH, SADD, ZADD, HMSET) (default: false)
           
         Examples:
           redis-dump
@@ -44,6 +45,7 @@ if (argv.help) {
         format: argv.json ? 'json' : 'redis',
         pretty: !!argv.pretty,
         tls: !!argv.tls,
+        dirty: !!argv.dirty
     };
     // Dump operation
     const doDump = () => {
